@@ -28,6 +28,10 @@ class SwarmExecutor:
         self.log_cmd(*args, **kwargs)
         return subprocess.check_call(*args, **kwargs)
 
+    def run(self, *args, **kwargs):
+        self.log_cmd(*args, **kwargs)
+        return subprocess.run(*args, **kwargs)
+
     def check_output(self, *args, **kwargs) -> bytes:
         self.log_cmd(*args, **kwargs)
         output = subprocess.check_output(*args, **kwargs)

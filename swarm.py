@@ -383,7 +383,7 @@ class Swarm(RetryingStateMachine):
 
     def initialize(self, next_state):
         self.kube_cache_done = threading.Event()
-        self.kube_cache = SwarmKubeCache(self.kube_cache_done)
+        self.kube_cache = SwarmKubeCache(self.kube_cache_done, self.logging)
         self.kube_cache_thread = threading.Thread(target=self.kube_cache.monitor, args=())
         self.kube_cache_thread.start()
         self.combined_agent.spawn()

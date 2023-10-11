@@ -277,6 +277,8 @@ class Agent(RetryingStateMachine, WithContainerConfigs):
             dry_forced_host_ipv4=self.cluster_agent_config.machine_ip,
         )
 
+        self.logging.info(f"Creating new agent with params: {new_agent_params}")
+
         response = self.swarm_agent_config.swarm_client.create_new_agent(new_agent_params=new_agent_params)
         try:
             return next_state if self.wait_for_completion(response.id) else self.state

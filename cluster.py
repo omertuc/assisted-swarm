@@ -69,6 +69,7 @@ class Cluster(RetryingStateMachine, WithContainerConfigs):
 
         self.cluster_config = cluster_config
         self.swarm_agent_config = swarm_agent_config
+        self.executor = cluster_config.executor
 
         self.identifier = f"{cluster_config.swarm_identifier}-{cluster_config.index}"
         self.cluster_dir = cluster_config.storage_dir / self.identifier
@@ -208,7 +209,7 @@ class Cluster(RetryingStateMachine, WithContainerConfigs):
         return next_state
 
     def apply_manifests(self, next_state):
-        subprocess.run(["oc", "apply", "-f", "-"], input=self.manifests.encode("utf-8"), check=True)
+        self.executor.run(["oc", "apply", "-f", "-"], input=self.manifests.encode("utf-8"), check=True)
 
         return next_state
 

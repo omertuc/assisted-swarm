@@ -1,6 +1,7 @@
 import subprocess
 import json
 import time
+from swarmexecutor import SwarmExecutor
 from threading import Event
 
 
@@ -11,7 +12,7 @@ class SwarmKubeCache:
     blasting the kube-api endpoint with requests (and consuming a lot of memory, CPU, and network
     resources in the process).
     """
-    def __init__(self, done: Event):
+    def __init__(self, done: Event, logging):
         self.cache = {
             "agentclusterinstalls": {},
             "baremetalhosts": {},
@@ -19,6 +20,8 @@ class SwarmKubeCache:
         }
 
         self.done = done
+        self.logging = logging
+        self.executor = SwarmExecutor(self.logging)
 
     def get_infraenv(self, name, namespace):
         return self.cache["infraenvs"].get(f"{namespace}/{name}", None)
@@ -33,7 +36,7 @@ class SwarmKubeCache:
         """
         Cache all the kube-api objects of a given type.
         """
-        result = json.loads(subprocess.check_output(["oc", "get", api_type, "-A", "-ojson"]).decode("utf-8"))
+        result = json.loads(self.executor.check_output(["oc", "get", api_type, "-A", "-ojson"]).decode("utf-8"))
 
         for api_object in result["items"]:
             self.cache[api_type][f"{api_object['metadata']['namespace']}/{api_object['metadata']['name']}"] = api_object
